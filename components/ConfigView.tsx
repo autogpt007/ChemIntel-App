@@ -75,11 +75,48 @@ const ConfigView: React.FC<ConfigViewProps> = ({
 
                       <div className="space-y-4">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Active Neural Engine</label>
-                        <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl">
-                          <p className="text-xs font-black text-white">Hybrid: Gemini Direct + OpenRouter Fallback</p>
-                          <p className="text-[9px] text-slate-500 font-bold uppercase mt-1 italic">Uses Google AI Studio credits first, then switches to OpenRouter automatically.</p>
+                        <div className="grid grid-cols-2 gap-4">
+                          <button 
+                            onClick={() => setSystemConfig({...systemConfig, aiEngine: 'gemini'})}
+                            className={`p-4 border rounded-2xl transition-all text-left ${systemConfig.aiEngine === 'gemini' ? 'bg-blue-600/10 border-blue-500 shadow-lg shadow-blue-500/10' : 'bg-slate-950 border-slate-800 hover:border-slate-700'}`}
+                          >
+                            <div className="flex items-center gap-3 mb-1">
+                              <Cpu className={`w-4 h-4 ${systemConfig.aiEngine === 'gemini' ? 'text-blue-500' : 'text-slate-500'}`} />
+                              <p className={`text-xs font-black ${systemConfig.aiEngine === 'gemini' ? 'text-white' : 'text-slate-400'}`}>Gemini Direct</p>
+                            </div>
+                            <p className="text-[9px] text-slate-500 font-bold uppercase italic">Native Google Neural Core.</p>
+                          </button>
+                          <button 
+                            onClick={() => setSystemConfig({...systemConfig, aiEngine: 'openrouter'})}
+                            className={`p-4 border rounded-2xl transition-all text-left ${systemConfig.aiEngine === 'openrouter' ? 'bg-indigo-600/10 border-indigo-500 shadow-lg shadow-indigo-500/10' : 'bg-slate-950 border-slate-800 hover:border-slate-700'}`}
+                          >
+                            <div className="flex items-center gap-3 mb-1">
+                              <Network className={`w-4 h-4 ${systemConfig.aiEngine === 'openrouter' ? 'text-indigo-500' : 'text-slate-500'}`} />
+                              <p className={`text-xs font-black ${systemConfig.aiEngine === 'openrouter' ? 'text-white' : 'text-slate-400'}`}>OpenRouter Cluster</p>
+                            </div>
+                            <p className="text-[9px] text-slate-500 font-bold uppercase italic">Multi-model neural orchestration.</p>
+                          </button>
                         </div>
                       </div>
+
+                      {systemConfig.aiEngine === 'openrouter' && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">OpenRouter Model Cluster</label>
+                          <select 
+                            value={systemConfig.openRouterModel}
+                            onChange={(e) => setSystemConfig({...systemConfig, openRouterModel: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 px-6 py-4 rounded-2xl text-xs font-black text-white outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                          >
+                            <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash (Fastest)</option>
+                            <option value="google/gemini-2.0-pro-exp-02-05:free">Gemini 2.0 Pro (Free Experimental)</option>
+                            <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Advanced Reasoning)</option>
+                            <option value="deepseek/deepseek-chat">DeepSeek Chat (Efficient)</option>
+                            <option value="openai/gpt-4o-mini">GPT-4o Mini (Balanced)</option>
+                            <option value="meta-llama/llama-3.1-405b">Llama 3.1 405B (Massive Scale)</option>
+                          </select>
+                          <p className="text-[9px] text-slate-600 font-bold uppercase italic">Select a specialized model from the OpenRouter cluster.</p>
+                        </div>
+                      )}
                    </div>
                 </section>
 

@@ -3,7 +3,7 @@ import React from 'react';
 import { NewsArticle } from '../types';
 import { 
   Newspaper, ExternalLink, TrendingUp, TrendingDown, 
-  Minus, Clock, Globe, Tag, AlertTriangle, Zap, Radar
+  Minus, Clock, Globe, Tag, AlertTriangle, Zap, Radar, BrainCircuit
 } from 'lucide-react';
 
 interface NewsFeedViewProps {
@@ -15,19 +15,19 @@ interface NewsFeedViewProps {
 const NewsFeedView: React.FC<NewsFeedViewProps> = ({ news, loading, onRefresh }) => {
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
-      <div className="bg-[#0c1220] border border-slate-800 p-12 rounded-[4rem] space-y-10 relative overflow-hidden group shadow-3xl">
-        <div className="flex flex-col md:flex-row gap-10 items-center">
-          <div className="w-24 h-24 bg-blue-600/10 rounded-full flex items-center justify-center shrink-0 ring-8 ring-blue-600/5 shadow-2xl">
-            <Newspaper className="w-10 h-10 text-blue-500" />
+      <div className="bg-[#0c1220] border border-slate-800 p-6 lg:p-12 rounded-3xl lg:rounded-[4rem] space-y-10 relative overflow-hidden group shadow-3xl">
+        <div className="flex flex-col md:flex-row gap-6 lg:gap-10 items-center">
+          <div className="w-16 h-16 lg:w-24 lg:h-24 bg-blue-600/10 rounded-full flex items-center justify-center shrink-0 ring-8 ring-blue-600/5 shadow-2xl">
+            <Newspaper className="w-6 h-6 lg:w-10 lg:h-10 text-blue-500" />
           </div>
           <div className="text-center md:text-left flex-1">
-            <h2 className="text-5xl font-black text-white tracking-tighter mb-2">Neural News Feed</h2>
+            <h2 className="text-3xl lg:text-5xl font-black text-white tracking-tighter mb-2">Neural News Feed</h2>
             <p className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px]">Real-time Global Chemical Market Intelligence</p>
           </div>
           <button 
             onClick={onRefresh}
             disabled={loading}
-            className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all disabled:opacity-50"
+            className="w-full md:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 transition-all disabled:opacity-50"
           >
             <Zap className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             {loading ? 'Probing...' : 'Refresh Feed'}
@@ -37,7 +37,7 @@ const NewsFeedView: React.FC<NewsFeedViewProps> = ({ news, loading, onRefresh })
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {news.length > 0 ? news.map((article) => (
-          <div key={article.id} className="bg-[#0c1220] border border-slate-800 rounded-[3rem] p-8 flex flex-col relative group hover:border-blue-500/50 transition-all shadow-2xl">
+          <div key={article.id} className="bg-[#0c1220] border border-slate-800 rounded-3xl lg:rounded-[3rem] p-6 lg:p-8 flex flex-col relative group hover:border-blue-500/50 transition-all shadow-2xl">
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-3">
                 <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
@@ -49,6 +49,9 @@ const NewsFeedView: React.FC<NewsFeedViewProps> = ({ news, loading, onRefresh })
                 </div>
                 <span className="px-3 py-1 bg-blue-600/10 text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">
                   Score: {article.impactScore}
+                </span>
+                <span className="px-3 py-1 bg-slate-800 text-slate-400 rounded-lg text-[8px] font-black uppercase tracking-widest border border-slate-700 flex items-center gap-1">
+                  <BrainCircuit className="w-2.5 h-2.5" /> Neural: {article.sentiment}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-slate-500">

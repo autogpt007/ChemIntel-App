@@ -21,6 +21,8 @@ export interface IntegrationNode {
 
 export interface SystemConfig {
   aiModel: 'gemini-3-flash-preview' | 'gemini-3-pro-preview';
+  aiEngine: 'gemini' | 'openrouter';
+  openRouterModel: string;
   temperature: number;
   thinkingBudget: number;
   scrapingDepth: number;
@@ -117,8 +119,11 @@ export interface HubIntel {
   supplyLevel?: string;
   priceIndex?: number;
   summary?: string;
+  category?: MarketSegment;
   technicalSpecs?: { label: string; value: string }[];
   importRequirements?: { country: string; requirements: string; dutyEstimate: string }[];
+  peakSeason?: string;
+  forecastSkill?: number; // 0-100
 }
 
 export interface COASpecification {
@@ -126,6 +131,7 @@ export interface COASpecification {
   unit: string;
   specification: string;
   actualResult: string;
+  method?: string;
 }
 
 export interface COAEntry {
@@ -143,6 +149,33 @@ export interface COAEntry {
   authenticityScore: number; // 0-100
   labName?: string;
   stampUrl?: string;
+  isStandardized?: boolean;
+  vetted?: boolean;
+  agenticStack?: {
+    validator: boolean;
+    pharmScout: boolean;
+    regulatoryGuardian: boolean;
+    industrialMiner: boolean;
+    masterWeaver: boolean;
+  };
+  regulatory?: {
+    ghsPictograms: string[];
+    hazardStatements: string[];
+    precautionaryStatements: string[];
+    reachStatus?: string;
+  };
+  synonyms?: string;
+  catNumber?: string;
+  molecularFormula?: string;
+  molecularWeight?: string;
+  identification?: string;
+  analyticalInfo?: {
+    description?: string;
+    solubility?: string;
+    massByLCMS?: string;
+    h1NMR?: string;
+    purityByHPLC?: string;
+  };
 }
 
 export interface MarketSignal {
@@ -161,6 +194,9 @@ export interface MarketSignal {
   mainDemographic: string;
   globalInventory: 'Critically Low' | 'Low' | 'Moderate' | 'High';
   buyers?: BuyerLead[];
+  peakSeason?: string;
+  forecastSkill?: number; // 0-100
+  mathematicalConfidence?: number; // 0-100
 }
 
 export interface GeopoliticalImpact {
@@ -191,10 +227,55 @@ export interface NewsArticle {
 export interface NeuralProcessLog {
   id?: string;
   timestamp: string;
-  level: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+  level: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR' | 'NEURAL';
   message: string;
   status?: 'SUCCESS' | 'WARNING' | 'ERROR' | 'INFO';
   type?: 'Market' | 'Grounding' | 'Logistics' | 'Regulatory' | 'Custom';
+  agent?: string;
+}
+
+export interface AgentMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  agent?: string;
+  content: string;
+  timestamp: string;
+  status?: 'thinking' | 'complete' | 'error';
+  thoughtStream?: string[];
+  metadata?: {
+    confidence?: number;
+    sources?: string[];
+    mathModel?: string;
+  };
+}
+
+export interface AgentStats {
+  id: string;
+  name: string;
+  role: string;
+  status: 'Active' | 'Idle' | 'Thinking' | 'Offline';
+  tasksCompleted: number;
+  accuracy: number;
+  neuralLoad: number;
+  lastTask?: string;
+  uptime: string;
+}
+
+export interface AgentTask {
+  id: string;
+  agentId: string;
+  type: 'Market' | 'Document' | 'Compliance' | 'Logistics' | 'Regulatory';
+  status: 'Pending' | 'Running' | 'Completed' | 'Failed';
+  description: string;
+  timestamp: string;
+  result?: any;
+}
+
+export interface NeuralCouncilState {
+  messages: AgentMessage[];
+  activeAgents: string[];
+  isThinking: boolean;
+  agentStats: AgentStats[];
 }
 
 export interface SentimentSignal {

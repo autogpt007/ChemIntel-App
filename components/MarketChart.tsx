@@ -10,9 +10,9 @@ interface MarketChartProps {
 
 const MarketChart: React.FC<MarketChartProps> = ({ data, title }) => {
   return (
-    <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl h-80">
-      <h3 className="text-sm font-medium text-slate-400 mb-6 uppercase tracking-wider">{title}</h3>
-      <div className="w-full h-64 min-h-[256px]">
+    <div className="bg-slate-900/50 border border-slate-800 p-4 lg:p-6 rounded-2xl h-72 lg:h-80">
+      <h3 className="text-[10px] lg:text-sm font-medium text-slate-400 mb-4 lg:mb-6 uppercase tracking-wider">{title}</h3>
+      <div className="w-full h-48 lg:h-64 min-h-[192px] lg:min-h-[256px]">
         <ResponsiveContainer width="100%" height="100%" minHeight={0}>
           <AreaChart data={data}>
             <defs>
@@ -22,10 +22,21 @@ const MarketChart: React.FC<MarketChartProps> = ({ data, title }) => {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-            <XAxis dataKey="month" stroke="#64748b" />
-            <YAxis stroke="#64748b" />
+            <XAxis 
+              dataKey="month" 
+              stroke="#64748b" 
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis 
+              stroke="#64748b" 
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+            />
             <Tooltip 
-              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', fontSize: '10px' }}
               itemStyle={{ color: '#f8fafc' }}
             />
             <Area type="monotone" dataKey="demand" stroke="#3b82f6" fillOpacity={1} fill="url(#colorDemand)" strokeWidth={2} />

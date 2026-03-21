@@ -2,8 +2,8 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #050811;
-    color: #f8fafc;
+    background-color: #f8fafc;
+    color: #0f172a;
 }
 
 @keyframes marquee {
@@ -17,23 +17,23 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5);
+    background: #f1f5f9;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #1e293b;
+    background: #cbd5e1;
     border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: #94a3b8;
 }
 
-/* Neural Glow Effects */
+/* Neural Glow Effects - Subtle for light mode */
 .shadow-3xl {
-    box-shadow: 0 0 100px -20px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.05);
 }
 
 /* Responsive Table Shadows */
@@ -45,6 +45,15 @@ body {
     bottom: 0;
     width: 10px;
     pointer-events: none;
-    background: linear-gradient(to right, rgba(12, 18, 32, 0.8), transparent);
+    background: linear-gradient(to right, rgba(248, 250, 252, 0.8), transparent);
     z-index: 10;
+}
+
+/* Card Hover */
+.card-hover {
+    transition: all 0.2s ease-in-out;
+}
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }

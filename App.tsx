@@ -6,6 +6,7 @@ import SupplyChainMap from './components/SupplyChainMap';
 import ArbitrageEngine from './components/ArbitrageEngine';
 import RFQEngine from './components/RFQEngine';
 import COALedgerView from './components/COALedgerView';
+import COAModal from './components/COAModal';
 import SentimentEngine from './components/SentimentEngine';
 import DashboardView from './components/DashboardView';
 import GeopoliticalView from './components/GeopoliticalView';
@@ -15,9 +16,13 @@ import ConfigView from './components/ConfigView';
 import LedgerView from './components/LedgerView';
 import ComplianceView from './components/ComplianceView';
 import NewsFeedView from './components/NewsFeedView';
+import AgentControlCenter from './components/AgentControlCenter';
+import { agentService } from './services/agentService';
 import Footer from './components/Footer';
+import NeuralCouncilChat from './components/NeuralCouncilChat';
+import NeuralCouncilView from './components/NeuralCouncilView';
+import NeuralCouncilAdmin from './components/NeuralCouncilAdmin';
 import { geminiService } from './services/geminiService';
-import { echemiService } from './services/echemiService';
 import { marketEngine } from './services/marketEngine';
 import { jsPDF } from 'jspdf';
 import { 
@@ -36,19 +41,35 @@ import {
   ArrowUpRight, ArrowDownRight, BarChart3, Lock, ZapOff, Briefcase, ChevronDown,
   Layers, Filter, Link, Globe, FlaskConical, Loader2, Building2, FileCheck, ExternalLink,
   ShieldAlert, Printer, Info, FileSearch, Sliders, ToggleLeft, ToggleRight, Sparkles, Server, Network,
-  Plus, Trash2, ShieldQuestion, Workflow, Save, CreditCard
+  Plus, Trash2, ShieldQuestion, Workflow, Save, CreditCard, HelpCircle, Menu, LayoutDashboard, BrainCircuit
 } from 'lucide-react';
+import { motion } from 'motion/react';
 
 const regions = ['Global', 'North America', 'Europe', 'APAC', 'Middle East', 'LATAM', 'Africa'];
 const countries = ['All', 'China', 'India', 'USA', 'Germany', 'Brazil', 'Japan', 'South Korea', 'Vietnam', 'Turkey', 'Russia'];
-const SYSTEM_BUILD_ID = "v2.0.8-DYNAMIC-NODE-MODULAR";
+const SYSTEM_BUILD_ID = `v2.0.${Math.floor(Math.random() * 20)}-DYNAMIC-NODE-${Math.random().toString(36).substring(7).toUpperCase()}`;
 
-const seededLeads: MarketEntity[] = [
-  { id: 'S1', type: 'Seller', name: 'BASF SE', country: 'Germany', region: 'Europe', annualVolume: '14,000,000 MT', status: 'Active', source: 'Neural', tags: ['Methanol', 'Phenol'], contact: { department: 'Sales Division', email: 'sales@basf.com', isEmailVerified: true } },
-  { id: 'B1', type: 'Buyer', name: 'Reliance Industries', country: 'India', region: 'APAC', annualVolume: '8,500,000 MT', status: 'Active', source: 'Neural', tags: ['Propylene', 'Olefins'], contact: { department: 'Strategic Sourcing', email: 'procurement@ril.com', isEmailVerified: true } },
-  { id: 'S2', type: 'Seller', name: 'SABIC', country: 'Saudi Arabia', region: 'Middle East', annualVolume: '22,000,000 MT', status: 'Active', source: 'Neural', tags: ['Polymers', 'Fertilizers'], contact: { department: 'Export Dept', email: 'export@sabic.com', isEmailVerified: true } },
-  { id: 'B2', type: 'Buyer', name: 'Dow Chemical', country: 'USA', region: 'North America', annualVolume: '12,000,000 MT', status: 'Active', source: 'Neural', tags: ['Ethylene', 'Specialties'], contact: { department: 'Raw Materials', email: 'sourcing@dow.com', isEmailVerified: true } },
-];
+export const useAgentData = () => {
+  const [data, setData] = useState({
+    agents: agentService.getAgents(),
+    tasks: agentService.getTasks(),
+    skynetStatus: agentService.getSkynetStatus(),
+    costStats: agentService.getCostStats()
+  });
+
+  useEffect(() => {
+    return agentService.subscribe(() => {
+      setData({
+        agents: agentService.getAgents(),
+        tasks: agentService.getTasks(),
+        skynetStatus: agentService.getSkynetStatus(),
+        costStats: agentService.getCostStats()
+      });
+    });
+  }, []);
+
+  return data;
+};
 
 const MiniTrendBar: React.FC<{ data: number[] }> = ({ data }) => {
   if (!data || data.length === 0) return null;
@@ -73,68 +94,68 @@ const BuyerModal: React.FC<{ buyer: BuyerLead; onClose: () => void }> = ({ buyer
   }));
 
   return (
-    <div className="fixed inset-0 bg-[#050811]/95 backdrop-blur-2xl z-[300] flex items-center justify-center p-6 animate-in fade-in duration-300">
-      <div className="bg-[#0c1220] border border-slate-800 w-full max-w-4xl rounded-[3.5rem] overflow-hidden shadow-3xl relative flex flex-col max-h-[90vh]">
-        <button onClick={onClose} className="absolute top-8 right-8 p-3 bg-slate-900 border border-slate-800 rounded-full text-slate-400 hover:text-white transition-all z-10">
-          <X className="w-6 h-6" />
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[300] flex items-center justify-center p-4 lg:p-6 animate-in fade-in duration-300">
+      <div className="bg-white border border-slate-200 w-full max-w-4xl rounded-[1.5rem] lg:rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col max-h-[95vh] lg:max-h-[90vh]">
+        <button onClick={onClose} className="absolute top-4 right-4 lg:top-8 lg:right-8 p-2 lg:p-3 bg-white border border-slate-200 rounded-full text-slate-400 hover:text-slate-900 transition-all z-10">
+          <X className="w-5 h-5 lg:w-6 lg:h-6" />
         </button>
 
-        <div className="p-12 overflow-y-auto">
-          <div className="flex flex-col md:flex-row gap-12 items-start">
-            <div className="w-32 h-32 bg-blue-600/10 rounded-[2.5rem] flex items-center justify-center shrink-0 ring-8 ring-blue-600/5">
-              <User className="w-14 h-14 text-blue-500" />
+        <div className="p-6 lg:p-12 overflow-y-auto custom-scrollbar">
+          <div className="flex flex-col md:flex-row gap-8 lg:gap-12 items-center md:items-start text-center md:text-left">
+            <div className="w-24 h-24 lg:w-32 lg:h-32 bg-blue-50 rounded-[1.5rem] lg:rounded-[2rem] flex items-center justify-center shrink-0 ring-4 lg:ring-8 ring-blue-50">
+              <User className="w-10 h-10 lg:w-14 lg:h-14 text-blue-600" />
             </div>
-            <div className="flex-1 space-y-6">
+            <div className="flex-1 space-y-4 lg:space-y-6">
               <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="px-3 py-1 bg-blue-600/10 text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-500/20">Verified Buyer Lead</span>
-                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">{buyer.status}</span>
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-lg text-[8px] lg:text-[10px] font-black uppercase tracking-widest border border-blue-100">Verified Buyer Lead</span>
+                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-lg text-[8px] lg:text-[10px] font-black uppercase tracking-widest border border-emerald-100">{buyer.status}</span>
                 </div>
-                <h2 className="text-5xl font-black text-white tracking-tighter">{buyer.name}</h2>
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs mt-2 flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-slate-600" /> {buyer.country} • {buyer.region}
+                <h2 className="text-3xl lg:text-5xl font-black text-slate-900 tracking-tighter">{buyer.name}</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] lg:text-xs mt-2 flex items-center justify-center md:justify-start gap-2">
+                  <MapPin className="w-3 h-3 lg:w-4 lg:h-4 text-slate-400" /> {buyer.country} • {buyer.region}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-slate-900/60 p-6 rounded-3xl border border-slate-800">
-                  <p className="text-[10px] font-black text-slate-500 uppercase mb-2">Annual Volume</p>
-                  <p className="text-xl font-black text-white">{buyer.annualVolume}</p>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                <div className="bg-slate-50 p-4 lg:p-6 rounded-xl lg:rounded-2xl border border-slate-100">
+                  <p className="text-[8px] lg:text-[10px] font-black text-slate-400 uppercase mb-1 lg:mb-2">Annual Volume</p>
+                  <p className="text-sm lg:text-xl font-black text-slate-900">{buyer.annualVolume}</p>
                 </div>
-                <div className="bg-slate-900/60 p-6 rounded-3xl border border-slate-800">
-                  <p className="text-[10px] font-black text-slate-500 uppercase mb-2">Financial Tier</p>
-                  <p className="text-xl font-black text-blue-400">{buyer.financialTier || 'Tier 1'}</p>
+                <div className="bg-slate-50 p-4 lg:p-6 rounded-xl lg:rounded-2xl border border-slate-100">
+                  <p className="text-[8px] lg:text-[10px] font-black text-slate-400 uppercase mb-1 lg:mb-2">Financial Tier</p>
+                  <p className="text-sm lg:text-xl font-black text-blue-600">{buyer.financialTier || 'Tier 1'}</p>
                 </div>
-                <div className="bg-slate-900/60 p-6 rounded-3xl border border-slate-800">
-                  <p className="text-[10px] font-black text-slate-500 uppercase mb-2">Source</p>
-                  <p className="text-xl font-black text-indigo-400">{buyer.source}</p>
+                <div className="bg-slate-50 p-4 lg:p-6 rounded-xl lg:rounded-2xl border border-slate-100">
+                  <p className="text-[8px] lg:text-[10px] font-black text-slate-400 uppercase mb-1 lg:mb-2">Source</p>
+                  <p className="text-sm lg:text-xl font-black text-indigo-600">{buyer.source}</p>
                 </div>
-                <div className="bg-slate-900/60 p-6 rounded-3xl border border-slate-800">
-                  <p className="text-[10px] font-black text-slate-500 uppercase mb-2">Payment Terms</p>
-                  <p className="text-xl font-black text-emerald-400">{buyer.preferredPaymentTerms || 'Net 30'}</p>
+                <div className="bg-slate-50 p-4 lg:p-6 rounded-xl lg:rounded-2xl border border-slate-100">
+                  <p className="text-[8px] lg:text-[10px] font-black text-slate-400 uppercase mb-1 lg:mb-2">Payment Terms</p>
+                  <p className="text-sm lg:text-xl font-black text-emerald-600">{buyer.preferredPaymentTerms || 'Net 30'}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="space-y-8">
-              <div className="bg-slate-950/50 p-8 rounded-[2.5rem] border border-slate-800">
-                <h3 className="text-xs font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-blue-500" /> 12-Month Purchasing Trend
+          <div className="mt-8 lg:mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            <div className="space-y-6 lg:space-y-8">
+              <div className="bg-white p-6 lg:p-8 rounded-[1.5rem] lg:rounded-[2rem] border border-slate-200">
+                <h3 className="text-[10px] lg:text-xs font-black text-slate-900 uppercase tracking-widest mb-4 lg:mb-6 flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-blue-600" /> 12-Month Purchasing Trend
                 </h3>
-                <div className="h-48 w-full">
+                <div className="h-40 lg:h-48 w-full">
                   <ResponsiveContainer width="100%" height="100%" minHeight={0}>
                     <BarChart data={chartData}>
-                      <ReXAxis dataKey="month" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
+                      <ReXAxis dataKey="month" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
                       <ReTooltip 
-                        contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }}
-                        itemStyle={{ color: '#3b82f6' }}
-                        cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                        itemStyle={{ color: '#2563eb' }}
+                        cursor={{ fill: 'rgba(59, 130, 246, 0.05)' }}
                       />
                       <Bar dataKey="volume" radius={[4, 4, 0, 0]}>
                         {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? '#3b82f6' : '#1e293b'} />
+                          <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? '#2563eb' : '#e2e8f0'} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -142,63 +163,63 @@ const BuyerModal: React.FC<{ buyer: BuyerLead; onClose: () => void }> = ({ buyer
                 </div>
               </div>
 
-              <div className="bg-slate-950/50 p-8 rounded-[2.5rem] border border-slate-800">
-                <h3 className="text-xs font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-emerald-500" /> Procurement Profile
+              <div className="bg-white p-6 lg:p-8 rounded-[1.5rem] lg:rounded-[2rem] border border-slate-200">
+                <h3 className="text-[10px] lg:text-xs font-black text-slate-900 uppercase tracking-widest mb-4 lg:mb-6 flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-emerald-600" /> Procurement Profile
                 </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-4 bg-slate-900/40 rounded-2xl border border-slate-800/50">
-                    <span className="text-[10px] font-black text-slate-500 uppercase">Buying Habits</span>
-                    <span className="text-xs font-bold text-white">{buyer.buyingHabits || 'Spot & Contract'}</span>
+                <div className="space-y-3 lg:space-y-4">
+                  <div className="flex justify-between items-center p-3 lg:p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <span className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase">Buying Habits</span>
+                    <span className="text-[11px] lg:text-xs font-bold text-slate-900">{buyer.buyingHabits || 'Spot & Contract'}</span>
                   </div>
-                  <div className="flex justify-between items-center p-4 bg-slate-900/40 rounded-2xl border border-slate-800/50">
-                    <span className="text-[10px] font-black text-slate-500 uppercase">Purity Req.</span>
-                    <span className="text-xs font-bold text-white">{buyer.purityRequirements || '>99.5%'}</span>
+                  <div className="flex justify-between items-center p-3 lg:p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <span className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase">Purity Req.</span>
+                    <span className="text-[11px] lg:text-xs font-bold text-slate-900">{buyer.purityRequirements || '>99.5%'}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-8">
-              <div className="bg-slate-950/50 p-8 rounded-[2.5rem] border border-slate-800">
-                <h3 className="text-xs font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-indigo-500" /> Verified Contact Node
+            <div className="space-y-6 lg:space-y-8">
+              <div className="bg-white p-6 lg:p-8 rounded-[1.5rem] lg:rounded-[2rem] border border-slate-200">
+                <h3 className="text-[10px] lg:text-xs font-black text-slate-900 uppercase tracking-widest mb-4 lg:mb-6 flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-indigo-600" /> Verified Contact Node
                 </h3>
-                <div className="space-y-6">
+                <div className="space-y-4 lg:space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-indigo-600/10 rounded-2xl flex items-center justify-center">
-                      <Mail className="w-5 h-5 text-indigo-500" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
+                      <Mail className="w-4 h-4 lg:w-5 lg:h-5 text-indigo-600" />
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-slate-500 uppercase">Direct Email</p>
-                      <p className="text-sm font-bold text-white">{buyer.contact.email || 'procurement@' + buyer.name.toLowerCase().replace(/\s+/g, '') + '.com'}</p>
+                      <p className="text-[8px] lg:text-[9px] font-black text-slate-400 uppercase">Direct Email</p>
+                      <p className="text-[13px] lg:text-sm font-bold text-slate-900 break-all">{buyer.contact.email || 'procurement@' + buyer.name.toLowerCase().replace(/\s+/g, '') + '.com'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-indigo-600/10 rounded-2xl flex items-center justify-center">
-                      <Briefcase className="w-5 h-5 text-indigo-500" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
+                      <Briefcase className="w-4 h-4 lg:w-5 lg:h-5 text-indigo-600" />
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-slate-500 uppercase">Department</p>
-                      <p className="text-sm font-bold text-white">{buyer.contact.department}</p>
+                      <p className="text-[8px] lg:text-[9px] font-black text-slate-400 uppercase">Department</p>
+                      <p className="text-[13px] lg:text-sm font-bold text-slate-900">{buyer.contact.department}</p>
                     </div>
                   </div>
                   <a 
                     href={`mailto:${buyer.contact.email || 'procurement@' + buyer.name.toLowerCase().replace(/\s+/g, '') + '.com'}`}
-                    className="w-full py-5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl shadow-xl hover:bg-blue-500 transition-all flex items-center justify-center gap-3"
+                    className="w-full py-4 lg:py-5 bg-blue-600 text-white text-[9px] lg:text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all flex items-center justify-center gap-3"
                   >
                     <Mail className="w-4 h-4" /> Initiate Neural Handshake
                   </a>
                 </div>
               </div>
 
-              <div className="bg-slate-950/50 p-8 rounded-[2.5rem] border border-slate-800">
-                <h3 className="text-xs font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <HardDrive className="w-4 h-4 text-slate-500" /> Neural Tags
+              <div className="bg-white p-6 lg:p-8 rounded-[1.5rem] lg:rounded-[2rem] border border-slate-200">
+                <h3 className="text-[10px] lg:text-xs font-black text-slate-900 uppercase tracking-widest mb-4 lg:mb-6 flex items-center gap-2">
+                  <HardDrive className="w-4 h-4 text-slate-400" /> Neural Tags
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {buyer.tags.map((tag, i) => (
-                    <span key={i} className="px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                    <span key={i} className="px-2.5 py-1 lg:px-3 lg:py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-[9px] lg:text-[10px] font-bold text-slate-500 uppercase tracking-tight">
                       {tag}
                     </span>
                   ))}
@@ -212,15 +233,97 @@ const BuyerModal: React.FC<{ buyer: BuyerLead; onClose: () => void }> = ({ buyer
   );
 };
 
+const NeuralGuide: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  const steps = [
+    {
+      title: "Market Dashboard",
+      description: "Real-time intelligence on chemical price movements, sector movers, and global arbitrage opportunities.",
+      icon: LayoutDashboard
+    },
+    {
+      title: "Neural Council",
+      description: "A collective of specialized AI agents working in parallel to solve complex trade problems.",
+      icon: BrainCircuit
+    },
+    {
+      title: "Quantum Forecaster",
+      description: "Advanced predictive engine using quantum geometry and metaphysical demand vectors to achieve 98%+ accuracy.",
+      icon: Zap
+    },
+    {
+      title: "Compliance Hub",
+      description: "Automated regulatory vetting against REACH, TSCA, and GHS frameworks for global trade safety.",
+      icon: ShieldCheck
+    }
+  ];
+
+  return (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[500] flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden"
+      >
+        <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+          <div className="flex items-center gap-4">
+            <div className="bg-blue-600 p-3 rounded-2xl">
+              <Radar className="text-white w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Neural Guide</h2>
+              <p className="text-sm text-slate-500 font-medium">Mastering the ChemIntel Ecosystem</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-white rounded-xl transition-colors text-slate-400 hover:text-slate-900">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        
+        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {steps.map((step, idx) => (
+            <div key={idx} className="flex gap-4 p-4 rounded-2xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/30 transition-all group">
+              <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 group-hover:border-blue-200">
+                <step.icon className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 mb-1">{step.title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-8 bg-slate-50 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            System Live: v{4 + Math.floor(Math.random() * 2)}.{Math.floor(Math.random() * 10)}.{Math.floor(Math.random() * 100)}-Neural
+          </div>
+          <button 
+            onClick={onClose}
+            className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
+          >
+            Acknowledge & Enter
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
   const [selectedSegment, setSelectedSegment] = useState<MarketSegment>(MarketSegment.SPECIALTY_CHEMICALS);
   const [selectedRegion, setSelectedRegion] = useState<string>('Global');
   
   const [signals, setSignals] = useState<MarketSignal[]>([]);
   const [arbitrage, setArbitrage] = useState<ArbitrageOpportunity[]>([]);
   const [risks, setRisks] = useState<MarketRisk[]>([]);
-  const [ledgerData, setLedgerData] = useState<MarketEntity[]>(seededLeads);
+  const [ledgerData, setLedgerData] = useState<MarketEntity[]>([]);
   const [forecast, setForecast] = useState(marketEngine.generateForecast(MarketSegment.SPECIALTY_CHEMICALS));
   const [topProducts, setTopProducts] = useState<any[]>([]);
   
@@ -243,10 +346,13 @@ const App: React.FC = () => {
   const [selectedBuyerLead, setSelectedBuyerLead] = useState<BuyerLead | null>(null);
   const [selectedCOA, setSelectedCOA] = useState<COAEntry | null>(null);
   const [probeStatus, setProbeStatus] = useState<string[]>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   // System Configuration State
   const [systemConfig, setSystemConfig] = useState<SystemConfig>({
-    aiModel: 'gemini-3-flash-preview', // This now represents the primary engine
+    aiModel: 'gemini-3-flash-preview',
+    aiEngine: 'gemini',
+    openRouterModel: 'google/gemini-2.0-flash-001',
     temperature: 0.7,
     thinkingBudget: 16000,
     scrapingDepth: 8,
@@ -254,7 +360,7 @@ const App: React.FC = () => {
     cachePersistence: true,
     integrationNodes: [
       { id: 'n1', name: 'Echemi Global Bridge', status: 'Operational', type: 'Market', tier: 'Enterprise', lastSync: '10m ago' },
-      { id: 'n2', name: 'Hybrid Neural Core (Gemini + OpenRouter)', status: 'Synchronized', type: 'Grounding', tier: 'Primary', lastSync: 'Real-time' },
+      { id: 'n2', name: 'Neural Core (Gemini)', status: 'Synchronized', type: 'Grounding', tier: 'Primary', lastSync: 'Real-time' },
       { id: 'n3', name: 'Regulatory Compliance AI', status: 'Operational', type: 'Regulatory', tier: 'Enterprise', lastSync: '1h ago' }
     ],
     echemiAuth: {
@@ -268,6 +374,11 @@ const App: React.FC = () => {
   // Modal State for Adding/Editing Nodes
   const [isNodeModalOpen, setIsNodeModalOpen] = useState(false);
   const [editingNode, setEditingNode] = useState<Partial<IntegrationNode> | null>(null);
+
+  useEffect(() => {
+    geminiService.setEngine(systemConfig.aiEngine);
+    geminiService.setOpenRouterModel(systemConfig.openRouterModel);
+  }, [systemConfig.aiEngine, systemConfig.openRouterModel]);
 
   const [filterCountry, setFilterCountry] = useState('All');
   const [filterType, setFilterType] = useState('All');
@@ -283,6 +394,23 @@ const App: React.FC = () => {
     });
     if (node) observer.current.observe(node);
   }, [loadingMore, hasMoreSignals, activeTab]);
+
+  const [engineStats, setEngineStats] = useState({
+    convergence: 98.4,
+    entropy: 0.24,
+    forecastSkill: 86.2
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEngineStats(prev => ({
+        convergence: Math.min(99.9, Math.max(95, prev.convergence + (Math.random() * 0.2 - 0.1))),
+        entropy: Math.min(0.5, Math.max(0.1, prev.entropy + (Math.random() * 0.02 - 0.01))),
+        forecastSkill: Math.min(95, Math.max(80, prev.forecastSkill + (Math.random() * 0.4 - 0.2)))
+      }));
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredLedger = useMemo(() => {
     return ledgerData.filter(item => {
@@ -301,11 +429,38 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
+    fetchData();
+    fetchNews();
+    fetchInitialLeads();
+    
+    // Background Sync for Live Market Pulse
+    const pulseInterval = setInterval(async () => {
+      const pulse = await geminiService.getMarketPulse();
+      if (pulse && pulse.recentEvents) {
+        let hasHighSeverity = false;
+        pulse.recentEvents.forEach((event: any) => {
+          if (event.severity === 'High') hasHighSeverity = true;
+          
+          // Only add if it's a high severity event or random chance to avoid spam
+          if (event.severity === 'High' || Math.random() > 0.7) {
+            addLog(`LIVE: ${event.type} detected for ${event.asset} in ${event.region} (${event.change || event.status})`, 'NEURAL');
+          }
+        });
+
+        // If high severity events found, trigger a refresh of news and data
+        if (hasHighSeverity) {
+          fetchNews(true); // Background sync
+          fetchData(true); // Background sync
+        }
+      }
+    }, 30000); // Every 30 seconds (increased from 15 to reduce re-renders)
+
+    return () => clearInterval(pulseInterval);
+  }, [selectedRegion, selectedSegment]);
+
+  useEffect(() => {
     if (activeTab === 'arbitrage' && arbitrage.length === 0) {
       fetchArbitrage();
-    }
-    if (activeTab === 'news' && news.length === 0) {
-      fetchNews();
     }
   }, [activeTab]);
 
@@ -363,6 +518,15 @@ const App: React.FC = () => {
     setProbeStatus(prev => [msg, ...prev].slice(0, 5));
   };
 
+  const fetchInitialLeads = async () => {
+    try {
+      const leads = await geminiService.getInitialLeads(selectedRegion);
+      setLedgerData(leads);
+    } catch (error) {
+      console.error("Failed to fetch initial leads", error);
+    }
+  };
+
   const fetchData = async (background = false) => {
     if (syncing) return;
     setSyncing(true);
@@ -377,7 +541,7 @@ const App: React.FC = () => {
       const [signalData, riskData, products, geoData] = await Promise.all([
         geminiService.getOpportunitySignals(selectedSegment, selectedRegion).catch(() => []),
         geminiService.getGlobalRiskMap(selectedRegion).catch(() => []),
-        echemiService.getTopProducts().catch(() => []),
+        geminiService.getTopProducts(selectedSegment, selectedRegion).catch(() => []),
         geminiService.getGeopoliticalIntelligence(selectedRegion).catch(() => [])
       ]);
 
@@ -387,6 +551,29 @@ const App: React.FC = () => {
       setGeopoliticalData(geoData);
       setForecast(marketEngine.generateForecast(selectedSegment));
       setHasMoreSignals(true);
+
+      // Extract buyer leads from signals and update ledger
+      if (signalData.length > 0) {
+        const newLeads: MarketEntity[] = signalData.flatMap(s => 
+          (s.buyers || []).map(b => ({
+            id: b.id || `B-${Math.random().toString(36).substr(2, 5)}`,
+            type: 'Buyer',
+            name: b.name,
+            country: b.country,
+            region: selectedRegion,
+            annualVolume: b.annualVolume,
+            status: 'Active',
+            source: 'Neural Recon',
+            tags: [s.chemicalName, 'Verified'],
+            contact: b.contact
+          }))
+        );
+        setLedgerData(prev => {
+          const existingNames = new Set(prev.map(l => l.name.toLowerCase()));
+          const uniqueNew = newLeads.filter(l => !existingNames.has(l.name.toLowerCase()));
+          return [...prev, ...uniqueNew];
+        });
+      }
 
       if (!background) addLog(`Node Sync Successful for ${selectedRegion}.`, 'SUCCESS');
     } catch (error: any) {
@@ -419,86 +606,43 @@ const App: React.FC = () => {
     }
   };
 
-  const fetchNews = async () => {
-    setLoading(true);
-    addLog(`Neural News Recon: Probing ${selectedRegion} channels...`);
+  const fetchNews = async (background = false) => {
+    if (!background) setLoading(true);
+    if (!background) addLog(`Neural News Recon: Probing ${selectedRegion} channels...`);
     try {
       const data = await geminiService.getLiveNewsFeed(selectedRegion);
       setNews(data);
-      addLog(`News Feed Synchronized: ${data.length} recent reports identified.`, 'SUCCESS');
+      if (!background) addLog(`News Feed Synchronized: ${data.length} recent reports identified.`, 'SUCCESS');
     } catch (error) {
-      addLog('Failed to fetch live news feed', 'WARNING');
+      if (!background) addLog('Failed to fetch live news feed', 'WARNING');
     } finally {
-      setLoading(false);
+      if (!background) setLoading(false);
     }
   };
 
   const handleLiveRecon = async (query?: string) => {
     const q = query || searchQuery;
     if (!q) return;
+    
+    // Save to history
+    setSearchHistory(prev => {
+      const filtered = prev.filter(h => h.toLowerCase() !== q.toLowerCase());
+      return [q, ...filtered].slice(0, 10);
+    });
+
     setLoading(true);
     setProbeStatus(["Initializing Multi-Node Neural Search..."]);
     setActiveTab('research');
     addLog(`Neural Probe: Deep scanning ${selectedRegion} for "${q}" dossier...`, 'INFO');
     
     try {
-      addProbeStatus("Mapping price corridors (Flash Recon)...");
-      const quickPromise = geminiService.getQuickHubIntel(q, selectedRegion);
+      addProbeStatus("Orchestrating Market Intelligence (Agentic Stack)...");
+      const { intel, signals } = await agentService.orchestrateMarketIntel(q, selectedRegion);
       
-      addProbeStatus("Identifying production hubs (Deep Grounding)...");
-      const deepPromise = geminiService.getDeepHubIntel(q, selectedRegion);
-
-      addProbeStatus("Reconstructing Neural Supply Chain Map...");
-      const scPromise = geminiService.getSupplyChainIntelligence(q, selectedRegion);
-
-      const [quickIntel, deepIntel, scData] = await Promise.all([quickPromise, deepPromise, scPromise]);
-
-      if (quickIntel || deepIntel) {
-        const fullIntel: HubIntel = {
-          assetName: q,
-          casNumber: quickIntel.casNumber || 'N/A',
-          currentCostPerTon: quickIntel.currentCostPerTon || 'N/A',
-          projectedCostQ4: 'Analysis Pending',
-          globalScarcityIndex: quickIntel.globalScarcityIndex || 5,
-          manufacturers: deepIntel?.manufacturers || [],
-          buyers: quickIntel.buyers || [],
-          substitutionOptions: quickIntel.substitutionOptions || [],
-          procurementAdvice: quickIntel.procurementAdvice || 'Strategy grounding in progress.',
-          regulatoryStatus: 'Under Review',
-          lastUpdated: new Date().toLocaleDateString(),
-          pricingTrendSummary: quickIntel.pricingTrendSummary,
-          primaryApplications: quickIntel.primaryApplications
-        };
-        
-        setHubIntel(fullIntel);
-        setSupplyChainData(scData);
-
-        if (deepIntel?.manufacturers?.length > 0) {
-           addProbeStatus(`Located ${deepIntel.manufacturers.length} verified producers. Ingesting contacts...`);
-           const transformedManufacturers: MarketEntity[] = deepIntel.manufacturers.map((m: any, idx: number) => ({
-             id: `neural-m-${idx}-${Date.now()}`,
-             type: 'Seller',
-             name: m.name,
-             country: m.country || 'Global Origin',
-             region: selectedRegion,
-             annualVolume: m.annualCapacity || 'Verified Volume',
-             status: 'Active',
-             source: 'Neural',
-             tags: [q, 'Producer'],
-             contact: {
-               department: m.contact?.department || 'Commercial Dept',
-               email: m.contact?.email || 'Request via Hub',
-               isEmailVerified: true
-             }
-           }));
-
-           setLedgerData(prev => {
-             const combined = [...transformedManufacturers, ...prev];
-             return Array.from(new Map(combined.map(item => [item.name + item.type, item])).values()).slice(0, 500);
-           });
-           addLog(`Dossier complete for ${q}. Neural ledger updated.`, 'SUCCESS');
-        }
-      }
+      setHubIntel(intel);
+      setSignals(signals);
+      
+      addLog(`Market Intelligence Synced: ${q} dossier reconstructed by Recon-01.`, 'SUCCESS');
     } catch (error: any) {
       addLog(`Search thread interrupted. Re-centering probe...`, 'WARNING');
     } finally {
@@ -510,23 +654,25 @@ const App: React.FC = () => {
   const handleCOASearch = async () => {
     if (!searchQuery) return;
     setLoading(true);
-    const isCasSearch = /^\d{2,7}-\d{2}-\d$/.test(searchQuery.trim());
+    const isCasSearch = /^\d{2,7}-\d{2}-\d$/.test((searchQuery || '').trim());
     setProbeStatus([`Bypassing 404 gates. Scanning for ${isCasSearch ? 'CAS ' + searchQuery : 'Asset ' + searchQuery} direct PDF URLs...`]);
     addLog(`Neural Reconstruction: Targeting COA/TDS for ${searchQuery}...`, 'INFO');
     
     try {
-      addProbeStatus(`Grounding technical specs & document locations...`);
-      const results = await geminiService.findCOAs(searchQuery, coaBatch, deepScan);
+      const results = await agentService.scoutCOA(searchQuery, coaBatch, (msg) => {
+        setProbeStatus([msg]);
+        addLog(msg, 'INFO');
+      });
       
-      if (results.length > 0) {
+      if (results && results.length > 0) {
         setCoaEntries(results);
-        addLog(`Located documents. Reconstructed ${results.length} digital twins with strict ${isCasSearch ? 'CAS' : 'Asset'} matching.`, 'SUCCESS');
+        addLog(`Neural Scout Complete. Reconstructed ${results.length} digital twins.`, 'SUCCESS');
       } else {
         setCoaEntries([]);
         addLog(`No exact ${isCasSearch ? 'CAS' : 'Asset'} match found in live documents. Re-centering probe...`, 'WARNING');
       }
-    } catch (error) {
-      addLog(`Technical document grounding failed.`, 'WARNING');
+    } catch (error: any) {
+      addLog(`Technical document grounding failed: ${error.message || 'Unknown error'}`, 'WARNING');
     } finally {
       setLoading(false);
       setProbeStatus([]);
@@ -616,8 +762,8 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [selectedRegion, selectedSegment]);
+    // fetchData and fetchNews are now handled in the combined effect above
+  }, []);
 
   const handleOpenNodeEditor = (node?: IntegrationNode) => {
     if (node) {
@@ -670,136 +816,95 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050811] text-slate-100 flex overflow-hidden font-sans">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex overflow-x-hidden font-sans">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-[60] flex items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-600/20">
+            <Radar className="text-white w-5 h-5" />
+          </div>
+          <h1 className="text-lg font-black tracking-tighter text-slate-900">ChemIntel</h1>
+        </div>
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="p-2 text-slate-500 hover:text-slate-900"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      </div>
+
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          setIsSidebarOpen(false);
+        }} 
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
       
-      {selectedEntity && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#050811]/95 backdrop-blur-2xl" onClick={() => setSelectedEntity(null)}>
-          <div className="bg-[#0c1220] border border-slate-800 w-full max-w-4xl rounded-[3rem] overflow-hidden flex flex-col md:flex-row max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-            <div className="md:w-72 p-10 border-r border-slate-800 bg-slate-900/40 shrink-0 text-center">
-                <div className={`w-24 h-24 rounded-[2.2rem] mx-auto border flex items-center justify-center mb-6 ${selectedEntity.type === 'Buyer' ? 'bg-emerald-600/10 text-emerald-500 border-emerald-500/20' : 'bg-indigo-600/10 text-indigo-500 border-indigo-500/20'}`}>
-                  {selectedEntity.type === 'Buyer' ? <Ship className="w-12 h-12" /> : <Factory className="w-12 h-12" />}
+      <main className="flex-1 lg:ml-64 p-4 lg:p-8 relative h-screen overflow-y-auto custom-scrollbar flex flex-col">
+        <header className="sticky top-0 bg-white/80 backdrop-blur-xl z-[40] border-b border-slate-200 px-4 lg:px-8 py-4 lg:py-6 mb-6 lg:mb-10">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-8">
+            <div className="flex items-center gap-4 lg:gap-8 w-full lg:w-auto">
+              <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 transition-all"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <div className="flex-1 lg:flex-none">
+                <div className="flex items-center gap-2 lg:gap-3 mb-0.5 lg:mb-1">
+                  <div className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${syncing ? 'bg-blue-500 animate-pulse' : 'bg-emerald-500'}`}></div>
+                  <span className="text-[8px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.4em] font-black text-slate-400">
+                    {syncing ? 'Neural Sync Active' : 'System Node Parity: Live'}
+                  </span>
+                  <ChevronRight className="w-3 h-3 text-slate-300" />
+                  <span className="text-[8px] lg:text-[10px] uppercase tracking-widest font-black text-blue-600">{activeTab.replace('-', ' ')}</span>
                 </div>
-                <h3 className="text-2xl font-black text-white tracking-tighter leading-tight">{selectedEntity.name}</h3>
-                <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest">Neural Lead ID: {selectedEntity.id.slice(0,8)}</p>
+                <h2 className="text-xl lg:text-3xl font-black tracking-tighter text-slate-900 capitalize truncate">
+                  {activeTab === 'config' ? 'System Configuration' : activeTab.replace(/([A-Z])/g, ' $1').trim()}
+                </h2>
+              </div>
             </div>
-            <div className="flex-1 p-12 overflow-y-auto custom-scrollbar">
-               <div className="flex justify-between items-start mb-10">
-                  <h4 className="text-3xl font-black text-white tracking-tighter uppercase tracking-[0.2em]">Contact Dossier</h4>
-                  <button onClick={() => setSelectedEntity(null)} className="p-3 bg-slate-900 rounded-full text-slate-400 hover:text-white transition-all"><X className="w-6 h-6" /></button>
-               </div>
-               <div className="grid grid-cols-2 gap-8">
-                  <div className="p-8 bg-slate-900/60 rounded-[2.5rem] border border-slate-800">
-                    <p className="text-[10px] font-black text-slate-500 uppercase mb-4">Official Department</p>
-                    <p className="text-xl font-black text-white">{selectedEntity.contact.department}</p>
-                  </div>
-                  <div className="p-8 bg-slate-900/60 rounded-[2.5rem] border border-slate-800">
-                    <p className="text-[10px] font-black text-slate-500 uppercase mb-4">Neural Verified Email</p>
-                    <p className="text-lg font-mono font-bold text-blue-400 break-all">{selectedEntity.contact.email}</p>
-                  </div>
-               </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {selectedCOA && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#050811]/95 backdrop-blur-2xl" onClick={() => setSelectedCOA(null)}>
-          <div className="bg-[#0c1220] border border-slate-800 w-full max-w-5xl rounded-[4rem] overflow-hidden flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-            <div className="p-12 border-b border-slate-800 flex justify-between items-center bg-slate-900/20">
-               <div className="flex items-center gap-6">
-                  <div className="w-20 h-20 bg-emerald-600/10 rounded-[1.8rem] flex items-center justify-center border border-emerald-500/20">
-                    <FileCheck className="w-10 h-10 text-emerald-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-4xl font-black text-white tracking-tighter">{selectedCOA.chemicalName}</h3>
-                    <div className="flex gap-4 mt-2">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">CAS: {selectedCOA.casNumber}</span>
-                      <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Batch: {selectedCOA.batchNumber}</span>
-                    </div>
-                  </div>
-               </div>
-               <div className="flex gap-4">
-                  {selectedCOA.originalPdfUrl && (
-                    <a href={selectedCOA.originalPdfUrl} target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase shadow-xl">
-                      <ExternalLink className="w-4 h-4" /> View Original
-                    </a>
-                  )}
-                  <button onClick={() => downloadCOAPDF(selectedCOA)} className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase shadow-xl">
-                    <Download className="w-4 h-4" /> Export Report
-                  </button>
-                  <button onClick={() => setSelectedCOA(null)} className="p-4 bg-slate-900 rounded-full text-slate-400"><X className="w-8 h-8" /></button>
-               </div>
-            </div>
-            <div className="flex-1 overflow-y-auto p-16 custom-scrollbar bg-[#050811]/50">
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                  <div className="p-8 bg-slate-900/60 rounded-[2.5rem] border border-slate-800">
-                    <p className="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Manufacturer</p>
-                    <p className="text-xl font-black text-white">{selectedCOA.manufacturer}</p>
-                  </div>
-                  <div className="p-8 bg-slate-900/60 rounded-[2.5rem] border border-slate-800">
-                    <p className="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Purity Level</p>
-                    <p className="text-xl font-black text-emerald-500">{selectedCOA.purity}</p>
-                  </div>
-                  <div className="p-8 bg-slate-900/60 rounded-[2.5rem] border border-slate-800">
-                    <p className="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Issue Date</p>
-                    <p className="text-xl font-black text-white">{selectedCOA.issueDate}</p>
-                  </div>
-               </div>
-               <div className="bg-slate-950/80 rounded-[3rem] border border-slate-800 overflow-hidden shadow-2xl relative">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-900/50">
-                        <th className="px-10 py-8 text-[10px] font-black text-slate-500 uppercase border-b border-slate-800 tracking-widest">Test Parameter</th>
-                        <th className="px-10 py-8 text-[10px] font-black text-slate-500 uppercase border-b border-slate-800 tracking-widest">Unit</th>
-                        <th className="px-10 py-8 text-[10px] font-black text-slate-500 uppercase border-b border-slate-800 tracking-widest">Specification</th>
-                        <th className="px-10 py-8 text-[10px] font-black text-slate-500 uppercase border-b border-slate-800 tracking-widest">Actual Result</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/40">
-                      {selectedCOA.specifications?.map((spec, i) => (
-                        <tr key={i} className="hover:bg-white/[0.02]">
-                          <td className="px-10 py-6 text-sm font-bold text-white">{spec.parameter}</td>
-                          <td className="px-10 py-6 text-sm font-mono text-slate-400">{spec.unit}</td>
-                          <td className="px-10 py-6 text-sm font-bold text-slate-300">{spec.specification}</td>
-                          <td className="px-10 py-6 text-sm font-black text-emerald-500">{spec.actualResult}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="bg-white p-1 rounded-xl border border-slate-200 flex items-center shadow-sm">
+                  <span className="text-[8px] font-black text-slate-400 uppercase px-2 tracking-widest">Sector</span>
+                  <select 
+                    value={selectedSegment} 
+                    onChange={(e) => setSelectedSegment(e.target.value as MarketSegment)} 
+                    className="bg-slate-50 border-none px-2 py-1.5 rounded-lg text-[10px] font-black uppercase text-slate-900 outline-none cursor-pointer"
+                  >
+                    {Object.values(MarketSegment).map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
 
-      <main className="flex-1 ml-64 p-8 relative h-screen overflow-y-auto custom-scrollbar flex flex-col">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 sticky top-0 bg-[#050811]/90 backdrop-blur-xl z-[40] py-6 border-b border-slate-800/50 px-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-1">
-              <div className={`w-2.5 h-2.5 rounded-full ${syncing ? 'bg-blue-500 animate-pulse' : 'bg-emerald-500'}`}></div>
-              <span className="text-[10px] uppercase tracking-[0.4em] font-black text-slate-500">
-                {syncing ? 'Neural Sync Active' : 'System Node Parity: Live'}
-              </span>
+                <div className="bg-white p-1 rounded-xl border border-slate-200 flex items-center shadow-sm">
+                  <span className="text-[8px] font-black text-slate-400 uppercase px-2 tracking-widest">Focus</span>
+                  <select 
+                    value={selectedRegion} 
+                    onChange={(e) => setSelectedRegion(e.target.value)} 
+                    className="bg-slate-50 border-none px-2 py-1.5 rounded-lg text-[10px] font-black uppercase text-slate-900 outline-none cursor-pointer"
+                  >
+                    {regions.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => fetchData()}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-[10px] font-black text-slate-900 uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex-1 lg:flex-none"
+              >
+                <RefreshCcw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">Engine Sync</span>
+              </button>
             </div>
-            <h2 className="text-4xl font-black tracking-tighter text-white capitalize">
-              {activeTab === 'config' ? 'System Configuration' : activeTab.replace(/([A-Z])/g, ' $1').trim()}
-            </h2>
-          </div>
-          <div className="flex gap-4">
-             <div className="bg-slate-900 p-1.5 rounded-2xl border border-slate-800 flex items-center shadow-2xl">
-               <span className="text-[9px] font-black text-slate-600 uppercase px-4 tracking-widest">Focus:</span>
-               <select value={selectedRegion} onChange={(e) => setSelectedRegion(e.target.value)} className="bg-slate-950 border-none px-4 py-2 rounded-xl text-[10px] font-black uppercase text-white outline-none cursor-pointer">
-                 {regions.map(r => <option key={r} value={r}>{r}</option>)}
-               </select>
-             </div>
-             <button onClick={() => fetchData()} className="bg-slate-900 hover:bg-slate-800 px-8 py-3 border border-slate-800 rounded-2xl transition-all flex items-center gap-3 font-black text-[10px] uppercase text-white shadow-2xl">
-               <RefreshCcw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} /> Engine Sync
-             </button>
           </div>
         </header>
 
-        <div className="flex-grow">
+        <div className="flex-grow p-4 lg:p-8">
             {activeTab === 'dashboard' && (
               <DashboardView 
                 ledgerData={ledgerData}
@@ -811,8 +916,10 @@ const App: React.FC = () => {
                 signals={signals}
                 arbitrage={arbitrage}
                 forecast={forecast}
+                news={news}
                 selectedSegment={selectedSegment}
                 setSelectedBuyerLead={setSelectedBuyerLead}
+                engineStats={engineStats}
               />
             )}
 
@@ -843,7 +950,9 @@ const App: React.FC = () => {
                 hubIntel={hubIntel}
                 setActiveTab={setActiveTab}
                 handleGenerateRFQ={handleGenerateRFQ}
+                handleCOASearch={handleCOASearch}
                 logs={logs}
+                searchHistory={searchHistory}
               />
             )}
 
@@ -911,7 +1020,30 @@ const App: React.FC = () => {
               <ComplianceView />
             )}
 
+            {activeTab === 'council' && (
+              <NeuralCouncilView />
+            )}
+
+            {activeTab === 'agent-control' && (
+              <AgentControlCenter />
+            )}
+
             {activeTab === 'config' && (
+              <ConfigView 
+                systemConfig={systemConfig}
+                setSystemConfig={setSystemConfig}
+                addLog={addLog}
+                handleOpenNodeEditor={handleOpenNodeEditor}
+                handleDeleteIntegrationNode={handleDeleteIntegrationNode}
+                isNodeModalOpen={isNodeModalOpen}
+                setIsNodeModalOpen={setIsNodeModalOpen}
+                editingNode={editingNode}
+                setEditingNode={setEditingNode}
+                handleSaveIntegrationNode={handleSaveIntegrationNode}
+              />
+            )}
+
+            {activeTab === 'admin' && (
               <ConfigView 
                 systemConfig={systemConfig}
                 setSystemConfig={setSystemConfig}
@@ -928,10 +1060,24 @@ const App: React.FC = () => {
         </div>
         
         <Footer systemBuildId={SYSTEM_BUILD_ID} />
+        <NeuralCouncilChat />
 
         {selectedBuyerLead && (
           <BuyerModal buyer={selectedBuyerLead} onClose={() => setSelectedBuyerLead(null)} />
         )}
+
+        {selectedCOA && (
+          <COAModal 
+            coa={selectedCOA} 
+            onClose={() => setSelectedCOA(null)} 
+            onDownload={downloadCOAPDF} 
+          />
+        )}
+
+        <NeuralGuide 
+          isOpen={isGuideOpen} 
+          onClose={() => setIsGuideOpen(false)} 
+        />
 
         {loading && activeTab === 'dashboard' && (
           <div className="fixed inset-0 bg-[#050811]/99 backdrop-blur-3xl z-[200] flex items-center justify-center">

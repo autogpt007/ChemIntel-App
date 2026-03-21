@@ -27,13 +27,13 @@ export class MarketEngine {
     const forecast: ForecastData[] = [];
     
     // Base values vary by segment
-    let basePrice = 1200;
+    let basePrice = 1200 + (Math.random() * 200 - 100);
     if (segment === MarketSegment.SPECIALTY_CHEMICALS || segment === MarketSegment.BIO_BASED) {
-      basePrice = 4500;
+      basePrice = 4500 + (Math.random() * 500 - 250);
     } else if (segment === MarketSegment.PHARMA_INGREDIENTS) {
-      basePrice = 8500;
+      basePrice = 8500 + (Math.random() * 1000 - 500);
     } else if (segment === MarketSegment.INDUSTRIAL_GASES) {
-      basePrice = 800;
+      basePrice = 800 + (Math.random() * 100 - 50);
     }
 
     let baseDemand = 60;
