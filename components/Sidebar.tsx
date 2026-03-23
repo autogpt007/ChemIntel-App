@@ -33,6 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpen, onCl
       items: [
         { id: 'dashboard', label: 'Market Dashboard', icon: LayoutDashboard },
         { id: 'news', label: 'Live News Feed', icon: Newspaper },
+        { id: 'integrations', label: 'Integration Hub', icon: Network },
         { id: 'geopolitical', label: 'Geopolitical', icon: Globe },
         { id: 'sentiment', label: 'Sentiment Engine', icon: MessageSquare },
         { id: 'research', label: 'Intelligence Hub', icon: Search },
@@ -82,12 +83,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpen, onCl
       `}>
         <div className="p-8 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-3 rounded-2xl shadow-lg shadow-blue-600/20">
-              <Radar className="text-white w-6 h-6" />
+            <div className="bg-blue-600 p-2.5 rounded-2xl shadow-lg shadow-blue-600/20">
+              <Radar className="text-white w-5 h-5" />
             </div>
             <div>
-               <h1 className="text-xl font-black tracking-tighter text-slate-900">ChemIntel</h1>
-               <p className="text-[8px] font-black text-blue-600 uppercase tracking-widest">Neural B2B Engine</p>
+               <h1 className="text-lg font-bold tracking-tight text-slate-900">ChemIntel</h1>
+               <p className="text-[9px] font-medium text-blue-600 uppercase tracking-widest">Neural B2B Engine</p>
             </div>
           </div>
           <button onClick={onClose} className="lg:hidden p-2 text-slate-400 hover:text-slate-900">
@@ -95,24 +96,24 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpen, onCl
           </button>
         </div>
 
-        <nav className="flex-1 mt-4 px-4 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 mt-2 px-4 overflow-y-auto custom-scrollbar">
           <div className="space-y-6 pb-8">
             {menuGroups.map((group) => (
               <div key={group.label}>
-                <p className="px-5 mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">{group.label}</p>
-                <div className="space-y-1">
+                <p className="px-5 mb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-70">{group.label}</p>
+                <div className="space-y-0.5">
                   {group.items.map((item) => (
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
                       className={`w-full flex items-center gap-3 px-5 py-2.5 rounded-xl transition-all ${
                         activeTab === item.id
-                          ? 'bg-blue-50 text-blue-600 font-bold'
+                          ? 'bg-blue-50 text-blue-700 font-semibold'
                           : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium'
                       }`}
                     >
                       <item.icon className={`w-4 h-4 ${activeTab === item.id ? 'text-blue-600' : 'text-slate-400'}`} />
-                      <span className="text-[11px] uppercase tracking-wider">{item.label}</span>
+                      <span className="text-xs tracking-tight">{item.label}</span>
                     </button>
                   ))}
                 </div>
@@ -121,19 +122,19 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpen, onCl
           </div>
         </nav>
 
-        <div className="p-4 border-t border-slate-100 space-y-4">
+        <div className="p-6 border-t border-slate-100 space-y-4">
           <NeuralEngineStatus />
           <div className="px-4 py-3 bg-slate-50 rounded-2xl border border-slate-200/50">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Neural Pulse</p>
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Neural Pulse</p>
+              <div className={`w-1.5 h-1.5 rounded-full ${
                 skynetStatus === 'Active' ? 'bg-emerald-500 animate-pulse' : 
                 skynetStatus === 'Waking' ? 'bg-yellow-500 animate-pulse' : 'bg-slate-300'
               }`}></div>
-              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-tight">
-                Skynet: {skynetStatus}
-              </span>
             </div>
+            <span className="text-[10px] text-slate-600 font-semibold uppercase tracking-tight">
+              Skynet: {skynetStatus}
+            </span>
           </div>
         </div>
       </div>

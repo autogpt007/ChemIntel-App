@@ -16,6 +16,7 @@ import ConfigView from './components/ConfigView';
 import LedgerView from './components/LedgerView';
 import ComplianceView from './components/ComplianceView';
 import NewsFeedView from './components/NewsFeedView';
+import IntegrationHub from './components/IntegrationHub';
 import AgentControlCenter from './components/AgentControlCenter';
 import { agentService } from './services/agentService';
 import Footer from './components/Footer';
@@ -843,68 +844,58 @@ const App: React.FC = () => {
         onClose={() => setIsSidebarOpen(false)}
       />
       
-      <main className="flex-1 lg:ml-64 p-4 lg:p-8 relative h-screen overflow-y-auto custom-scrollbar flex flex-col">
-        <header className="sticky top-0 bg-white/80 backdrop-blur-xl z-[40] border-b border-slate-200 px-4 lg:px-8 py-4 lg:py-6 mb-6 lg:mb-10">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-8">
-            <div className="flex items-center gap-4 lg:gap-8 w-full lg:w-auto">
+      <main className="flex-1 lg:ml-64 relative h-screen overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50">
+        <header className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 z-40">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
               <button 
                 onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 transition-all"
+                className="lg:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-xl"
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <div className="flex-1 lg:flex-none">
-                <div className="flex items-center gap-2 lg:gap-3 mb-0.5 lg:mb-1">
-                  <div className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${syncing ? 'bg-blue-500 animate-pulse' : 'bg-emerald-500'}`}></div>
-                  <span className="text-[8px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.4em] font-black text-slate-400">
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <div className={`w-1.5 h-1.5 rounded-full ${syncing ? 'bg-blue-500 animate-pulse' : 'bg-emerald-500'}`}></div>
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">
                     {syncing ? 'Neural Sync Active' : 'System Node Parity: Live'}
                   </span>
-                  <ChevronRight className="w-3 h-3 text-slate-300" />
-                  <span className="text-[8px] lg:text-[10px] uppercase tracking-widest font-black text-blue-600">{activeTab.replace('-', ' ')}</span>
                 </div>
-                <h2 className="text-xl lg:text-3xl font-black tracking-tighter text-slate-900 capitalize truncate">
+                <h2 className="text-lg font-bold tracking-tight text-slate-900 capitalize">
                   {activeTab === 'config' ? 'System Configuration' : activeTab.replace(/([A-Z])/g, ' $1').trim()}
                 </h2>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-              <div className="hidden sm:flex items-center gap-2">
-                <div className="bg-white p-1 rounded-xl border border-slate-200 flex items-center shadow-sm">
-                  <span className="text-[8px] font-black text-slate-400 uppercase px-2 tracking-widest">Sector</span>
-                  <select 
-                    value={selectedSegment} 
-                    onChange={(e) => setSelectedSegment(e.target.value as MarketSegment)} 
-                    className="bg-slate-50 border-none px-2 py-1.5 rounded-lg text-[10px] font-black uppercase text-slate-900 outline-none cursor-pointer"
-                  >
-                    {Object.values(MarketSegment).map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-
-                <div className="bg-white p-1 rounded-xl border border-slate-200 flex items-center shadow-sm">
-                  <span className="text-[8px] font-black text-slate-400 uppercase px-2 tracking-widest">Focus</span>
-                  <select 
-                    value={selectedRegion} 
-                    onChange={(e) => setSelectedRegion(e.target.value)} 
-                    className="bg-slate-50 border-none px-2 py-1.5 rounded-lg text-[10px] font-black uppercase text-slate-900 outline-none cursor-pointer"
-                  >
-                    {regions.map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-200/50">
+                <Search className="w-3.5 h-3.5 text-slate-400" />
+                <input 
+                  type="text"
+                  placeholder="Search neural ledger..."
+                  className="bg-transparent border-none focus:ring-0 text-xs text-slate-600 w-48 placeholder:text-slate-400"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
-
+              
               <button 
-                onClick={() => fetchData()}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-[10px] font-black text-slate-900 uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex-1 lg:flex-none"
+                onClick={() => handleLiveRecon('All')}
+                disabled={syncing}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                  syncing 
+                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
+                    : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20'
+                }`}
               >
                 <RefreshCcw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">Engine Sync</span>
+                <span className="hidden sm:inline">Sync Core</span>
               </button>
             </div>
           </div>
         </header>
 
-        <div className="flex-grow p-4 lg:p-8">
+        <div className="flex-grow p-6 lg:p-10">
             {activeTab === 'dashboard' && (
               <DashboardView 
                 ledgerData={ledgerData}
@@ -923,6 +914,7 @@ const App: React.FC = () => {
               />
             )}
 
+            {activeTab === 'integrations' && <IntegrationHub />}
             {activeTab === 'geopolitical' && (
               <GeopoliticalView 
                 geopoliticalData={geopoliticalData}
@@ -1080,15 +1072,15 @@ const App: React.FC = () => {
         />
 
         {loading && activeTab === 'dashboard' && (
-          <div className="fixed inset-0 bg-[#050811]/99 backdrop-blur-3xl z-[200] flex items-center justify-center">
-            <div className="text-center space-y-16 animate-in zoom-in-95 duration-500">
-               <div className="relative">
-                  <div className="w-64 h-64 border-[12px] border-blue-600/10 border-t-blue-600 rounded-full animate-spin mx-auto shadow-3xl"></div>
-                  <div className="absolute inset-0 flex items-center justify-center"><Radar className="w-20 h-20 text-blue-500 animate-pulse" /></div>
+          <div className="fixed inset-0 bg-white/90 backdrop-blur-xl z-[200] flex items-center justify-center">
+            <div className="text-center space-y-8 animate-in fade-in zoom-in-95 duration-700">
+               <div className="relative flex items-center justify-center">
+                  <div className="w-32 h-32 border-4 border-slate-100 border-t-blue-600 rounded-full animate-spin"></div>
+                  <div className="absolute"><Radar className="w-10 h-10 text-blue-600 animate-pulse" /></div>
                </div>
-               <div className="space-y-4">
-                  <h3 className="text-6xl font-black text-white tracking-tighter">Synchronizing Neural Core</h3>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.5em]">Grounding Global Region Corridors</p>
+               <div className="space-y-2">
+                  <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Synchronizing Neural Core</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Grounding Global Market Corridors</p>
                </div>
             </div>
           </div>

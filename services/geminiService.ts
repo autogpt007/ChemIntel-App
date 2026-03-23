@@ -5,6 +5,8 @@ import { MarketSegment, MarketSignal, HubIntel, ArbitrageOpportunity, MarketRisk
 export class GeminiService {
   private engine: 'gemini' | 'openrouter' = 'gemini';
   private openRouterModel: string = "google/gemini-2.0-flash-001";
+  private neuralCache: Map<string, { response: string, timestamp: number }> = new Map();
+  private CACHE_TTL = 1000 * 60 * 60; // 1 hour
 
   setEngine(engine: 'gemini' | 'openrouter') {
     this.engine = engine;
@@ -66,14 +68,54 @@ export class GeminiService {
   }
 
   /**
+   * NEURAL ROUTER: Analyzes the task and selects the optimal model from the OpenRouter cluster.
+   */
+  private neuralRoute(prompt: string): string {
+    const p = prompt.toLowerCase();
+    if (p.includes('search') || p.includes('recon') || p.includes('news')) {
+      return "google/gemini-2.0-flash-001"; // Best for real-time search
+    }
+    if (p.includes('reasoning') || p.includes('council') || p.includes('geopolitical')) {
+      return "anthropic/claude-3.5-sonnet"; // Best for complex reasoning
+    }
+    if (p.includes('json') || p.includes('schema') || p.includes('extract')) {
+      return "openai/gpt-4o-mini"; // Best for structured data
+    }
+    if (p.includes('summarize') || p.includes('large') || p.includes('scale')) {
+      return "meta-llama/llama-3.1-405b"; // Best for massive context
+    }
+    return this.openRouterModel; // Default to user selection
+  }
+
+  /**
    * UNIFIED GENERATE: Now supports both Gemini Direct and OpenRouter Cluster.
    */
   public async unifiedGenerate(prompt: string, options?: { geminiModel?: string, openRouterModel?: string, useSearch?: boolean, systemInstruction?: string }): Promise<string> {
-    if (this.engine === 'openrouter') {
-      return await this.callOpenRouter(prompt, options?.openRouterModel || this.openRouterModel, options?.systemInstruction);
+    const cacheKey = `${this.engine}-${options?.openRouterModel || this.openRouterModel}-${prompt}`;
+    const cached = this.neuralCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp < this.CACHE_TTL)) {
+      return cached.response;
     }
-    const tools = options?.useSearch ? [{ googleSearch: {} }] : undefined;
-    return await this.callGeminiDirectly(prompt, options?.geminiModel || "gemini-3-flash-preview", tools, options?.systemInstruction);
+
+    let response = "";
+    if (this.engine === 'openrouter') {
+      let model = options?.openRouterModel || this.openRouterModel;
+      
+      // If no specific model is forced, use the Neural Router
+      if (model === 'google/gemini-2.0-flash-001' || !options?.openRouterModel) {
+        model = this.neuralRoute(prompt);
+      }
+      
+      response = await this.callOpenRouter(prompt, model, options?.systemInstruction);
+    } else {
+      const tools = options?.useSearch ? [{ googleSearch: {} }] : undefined;
+      response = await this.callGeminiDirectly(prompt, options?.geminiModel || "gemini-3-flash-preview", tools, options?.systemInstruction);
+    }
+
+    if (response) {
+      this.neuralCache.set(cacheKey, { response, timestamp: Date.now() });
+    }
+    return response;
   }
 
   /**

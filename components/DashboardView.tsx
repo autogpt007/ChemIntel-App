@@ -73,300 +73,170 @@ const DashboardView: React.FC<DashboardViewProps> = ({
     : 98;
 
   return (
-    <div className="space-y-6 lg:space-y-10 animate-in fade-in duration-700 pb-20">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] lg:text-[10px] font-black uppercase tracking-widest border border-blue-100 flex items-center gap-2">
-              <Globe2 className="w-3 h-3" /> Search Grounded Intelligence
+    <div className="space-y-8 lg:space-y-12 animate-in fade-in duration-700 pb-20">
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl lg:text-5xl font-light text-slate-900 tracking-tight mb-4">Market Intelligence</h2>
+            <p className="text-slate-500 text-sm lg:text-base leading-relaxed">
+              Synthesized global chemical trade data, geopolitical risk signals, and neural market forecasts. 
+              Grounding every decision in verified node intelligence.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-[10px] font-semibold uppercase tracking-wider border border-blue-100 flex items-center gap-2">
+              <Globe2 className="w-3.5 h-3.5" /> Search Grounded
             </div>
-            <div className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] lg:text-[10px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-2">
-              <Zap className="w-3 h-3" /> Live Neural Recon
+            <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-semibold uppercase tracking-wider border border-emerald-100 flex items-center gap-2">
+              <Zap className="w-3.5 h-3.5" /> Neural Sync
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-          <div className="bg-white border border-slate-200 p-5 lg:p-8 rounded-2xl lg:rounded-[2rem] shadow-sm card-hover">
-            <h4 className="text-slate-400 text-[9px] lg:text-[10px] font-black uppercase mb-2">Verified Connections</h4>
-            <p className="text-xl lg:text-3xl font-black text-slate-900">{ledgerData.filter(l => selectedRegion === 'Global' || l.region === selectedRegion).length}</p>
+        {/* Key Metrics Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="stitch-card p-6 lg:p-8">
+            <h4 className="text-label mb-3">Verified Connections</h4>
+            <div className="flex items-baseline gap-2">
+              <p className="text-value">{ledgerData.filter(l => selectedRegion === 'Global' || l.region === selectedRegion).length}</p>
+              <span className="text-xs font-medium text-slate-400">Active Nodes</span>
+            </div>
           </div>
-          <div className="bg-white border border-slate-200 p-5 lg:p-8 rounded-2xl lg:rounded-[2rem] shadow-sm card-hover">
-            <h4 className="text-slate-400 text-[9px] lg:text-[10px] font-black uppercase mb-2">Geopolitical Signals</h4>
-            <p className="text-xl lg:text-3xl font-black text-orange-500">{geopoliticalData.length}</p>
+          <div className="stitch-card p-6 lg:p-8">
+            <h4 className="text-label mb-3">Geopolitical Signals</h4>
+            <div className="flex items-baseline gap-2">
+              <p className="text-value text-orange-600">{geopoliticalData.length}</p>
+              <span className="text-xs font-medium text-slate-400">Risk Indicators</span>
+            </div>
           </div>
-          <div className="bg-white border border-slate-200 p-5 lg:p-8 rounded-2xl lg:rounded-[2rem] shadow-sm card-hover">
-            <h4 className="text-slate-400 text-[9px] lg:text-[10px] font-black uppercase mb-2">Threat Vectors</h4>
-            <p className="text-xl lg:text-3xl font-black text-red-500">{risks.length}</p>
+          <div className="stitch-card p-6 lg:p-8">
+            <h4 className="text-label mb-3">Threat Vectors</h4>
+            <div className="flex items-baseline gap-2">
+              <p className="text-value text-red-600">{risks.length}</p>
+              <span className="text-xs font-medium text-slate-400">Critical Alerts</span>
+            </div>
           </div>
-          <div className="bg-white border border-slate-200 p-5 lg:p-8 rounded-2xl lg:rounded-[2rem] shadow-sm card-hover">
-            <h4 className="text-slate-400 text-[9px] lg:text-[10px] font-black uppercase mb-2">Compliance Pulse</h4>
-            <p className="text-xl lg:text-3xl font-black text-emerald-500">{complianceScore}%</p>
-          </div>
-          <div className="sm:col-span-2 lg:col-span-1 bg-white border border-slate-200 p-5 lg:p-8 rounded-2xl lg:rounded-[2rem] shadow-sm card-hover">
-            <h4 className="text-slate-400 text-[9px] lg:text-[10px] font-black uppercase mb-2">Market Sentiment</h4>
-            <p className={`text-xl lg:text-3xl font-black ${sentiment === 'Bullish' ? 'text-blue-600' : 'text-red-500'}`}>{sentiment}</p>
+          <div className="stitch-card p-6 lg:p-8">
+            <h4 className="text-label mb-3">Compliance Score</h4>
+            <div className="flex items-baseline gap-2">
+              <p className="text-value text-emerald-600">{complianceScore}%</p>
+              <span className="text-xs font-medium text-slate-400">System Health</span>
+            </div>
           </div>
         </div>
 
-       <div className="grid grid-cols-12 gap-6 lg:gap-8">
-          <div className="col-span-12 lg:col-span-8 space-y-6 lg:space-y-8">
-             <div className="bg-white border border-slate-200 rounded-2xl lg:rounded-[2.5rem] p-6 lg:p-10 shadow-sm overflow-hidden">
-                <div className="flex justify-between items-center mb-6 lg:mb-8">
-                  <h3 className="text-base lg:text-lg font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
-                    <Zap className="w-4 h-4 lg:w-5 lg:h-5 text-blue-600" /> Sector Movers
-                  </h3>
-                  <span className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Real-time Node Feed</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content Area */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="stitch-card p-6 lg:p-10">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-900 tracking-tight">Market Outlook</h3>
+                  <p className="text-xs text-slate-500 mt-1">Predictive forecast for {selectedSegment}</p>
                 </div>
-                <div className="overflow-x-auto scrollbar-hide">
-                  <table className="w-full text-left min-w-[500px]">
-                    <thead>
-                      <tr className="border-b border-slate-100">
-                        <th className="pb-4 text-[9px] lg:text-[10px] font-black text-slate-400 uppercase">Chemical Asset</th>
-                        <th className="pb-4 text-[9px] lg:text-[10px] font-black text-slate-400 uppercase">Category</th>
-                        <th className="pb-4 text-[9px] lg:text-[10px] font-black text-slate-400 uppercase text-right">Trend</th>
-                        <th className="pb-4 text-[9px] lg:text-[10px] font-black text-slate-400 uppercase text-right">Avg Spot</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {topProducts?.length > 0 ? topProducts.map((p, i) => (
-                        <tr key={i} className="group cursor-pointer hover:bg-slate-50 transition-all" onClick={() => handleLiveRecon(p.name)}>
-                          <td className="py-4 font-black text-slate-900 group-hover:text-blue-600 text-sm">{p.name}</td>
-                          <td className="py-4 text-[10px] lg:text-xs font-bold text-slate-400 uppercase">{p.sector}</td>
-                          <td className={`py-4 text-right font-black text-sm ${(p.trend?.startsWith('+') ?? false) ? 'text-emerald-600' : 'text-red-500'}`}>{p.trend}</td>
-                          <td className="py-4 text-right font-mono font-bold text-slate-900 text-sm">{p.price}</td>
-                        </tr>
-                      )) : (
-                        [1, 2, 3, 4, 5].map(i => (
-                          <tr key={i} className="animate-pulse">
-                            <td className="py-4"><div className="h-4 bg-slate-100 rounded w-3/4"></div></td>
-                            <td className="py-4"><div className="h-4 bg-slate-100 rounded w-1/2"></div></td>
-                            <td className="py-4"><div className="h-4 bg-slate-100 rounded w-1/4 ml-auto"></div></td>
-                            <td className="py-4"><div className="h-4 bg-slate-100 rounded w-1/3 ml-auto"></div></td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-             </div>
-
-             <div className="grid grid-cols-1 gap-6 lg:gap-8">
-                {signals?.length > 0 ? signals.map((s, i) => (
-                  <div key={i} className="bg-white border border-slate-200 rounded-2xl lg:rounded-[2.5rem] p-6 lg:p-10 flex flex-col relative overflow-hidden group hover:border-blue-500/50 transition-all shadow-sm card-hover">
-                      <div className="flex flex-col sm:flex-row justify-between items-start mb-6 lg:mb-10 z-10 gap-6">
-                         <div className="flex-1 w-full">
-                           <div className="flex flex-wrap items-center gap-2 mb-3">
-                             <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-100">Alpha Node</span>
-                             <span className="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-indigo-100">{s.segment}</span>
-                           </div>
-                           <h4 className="text-2xl lg:text-4xl font-black text-slate-900 group-hover:text-blue-600 tracking-tighter leading-none mb-4 lg:mb-6 truncate">{s.chemicalName}</h4>
-                           <div className="flex flex-wrap items-center gap-4 lg:gap-6">
-                             <div className="flex items-center gap-2 text-emerald-600">
-                                <TrendingUp className="w-4 h-4" />
-                                <span className="text-[10px] lg:text-[11px] font-black uppercase">{s.growthRate} G-Rate</span>
-                             </div>
-                             <div className="flex items-center gap-2 text-slate-400">
-                                <Activity className="w-4 h-4" />
-                                <span className="text-[10px] lg:text-[11px] font-black uppercase">{s.globalInventory} Supply</span>
-                             </div>
-                           </div>
-                         </div>
-                         <div className={`p-4 lg:p-5 rounded-2xl border self-start sm:self-auto ${s.demandTrend === 'Up' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-500'}`}>
-                           {s.demandTrend === 'Up' ? <TrendingUp className="w-6 h-6 lg:w-8 lg:h-8" /> : <TrendingDown className="w-6 h-6 lg:w-8 lg:h-8" />}
-                         </div>
-                      </div>
-
-                      <div className="bg-blue-50 border border-blue-100 p-5 lg:p-6 rounded-2xl mb-6 lg:mb-8 flex gap-4 items-start">
-                        <Lightbulb className="w-4 h-4 lg:w-5 lg:h-5 text-blue-600 shrink-0 mt-1" />
-                        <p className="text-[11px] lg:text-xs font-bold text-slate-600 leading-relaxed">{s.reasoning}</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8 z-10">
-                         <div className="bg-slate-50 p-4 lg:p-6 rounded-2xl border border-slate-100">
-                            <p className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase mb-2">Current Est.</p>
-                            <p className="text-lg lg:text-2xl font-black text-slate-900">{s.priceEstimate || 'Pending...'}</p>
-                         </div>
-                         <div className="bg-slate-50 p-4 lg:p-6 rounded-2xl border border-slate-100">
-                            <p className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase mb-2">Volatility</p>
-                            <p className="text-lg lg:text-2xl font-black text-blue-600">{s.volatilityScore}/100</p>
-                         </div>
-                         <div className="bg-slate-50 p-4 lg:p-6 rounded-2xl border border-slate-100">
-                            <p className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase mb-2">Opp. Score</p>
-                            <p className="text-lg lg:text-2xl font-black text-emerald-600">{s.opportunityScore}/100</p>
-                         </div>
-                         <div className="bg-slate-50 p-4 lg:p-6 rounded-2xl border border-slate-100">
-                            <p className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase mb-2">Forecast Skill</p>
-                            <p className="text-lg lg:text-2xl font-black text-indigo-600">{s.forecastSkill || 0}%</p>
-                         </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-3 lg:gap-4 mb-6 lg:mb-8 z-10">
-                        {s.peakSeason && (
-                          <div className="px-3 py-1.5 lg:px-4 lg:py-2 bg-orange-50 border border-orange-100 rounded-xl flex items-center gap-2">
-                            <TrendingUp className="w-3 h-3 text-orange-600" />
-                            <span className="text-[9px] lg:text-[10px] font-black text-orange-600 uppercase">Peak Season: {s.peakSeason}</span>
-                          </div>
-                        )}
-                        {s.mathematicalConfidence && (
-                          <div className="px-3 py-1.5 lg:px-4 lg:py-2 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center gap-2">
-                            <Calculator className="w-3 h-3 text-indigo-600" />
-                            <span className="text-[9px] lg:text-[10px] font-black text-indigo-600 uppercase">Math Confidence: {s.mathematicalConfidence}%</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {s.buyers && s.buyers.length > 0 && (
-                        <div className="mb-6 lg:mb-8 z-10">
-                          <button 
-                            onClick={() => toggleSignalExpansion(s.id)}
-                            className="flex items-center gap-2 text-[9px] lg:text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-colors"
-                          >
-                            {expandedSignals.includes(s.id) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                            {s.buyers.length} Verified Buyer Leads Identified
-                          </button>
-                          
-                          {expandedSignals.includes(s.id) && (
-                            <div className="mt-4 lg:mt-6 space-y-3 animate-in slide-in-from-top-4 duration-300">
-                              {s.buyers.map((buyer, bi) => (
-                                <div 
-                                  key={bi} 
-                                  onClick={() => setSelectedBuyerLead(buyer)}
-                                  className="bg-slate-50 border border-slate-100 p-4 lg:p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between group/buyer cursor-pointer hover:border-blue-200 transition-all gap-4"
-                                >
-                                  <div className="flex items-center gap-4">
-                                    <div className="w-8 h-8 lg:w-10 lg:h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                                      <User className="w-4 h-4 lg:w-5 lg:h-5 text-blue-600" />
-                                    </div>
-                                    <div>
-                                      <p className="text-sm font-black text-slate-900 group-hover/buyer:text-blue-600 transition-colors">{buyer.name}</p>
-                                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight flex items-center gap-1">
-                                        <MapPin className="w-3 h-3" /> {buyer.country} • {buyer.annualVolume}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center justify-between w-full sm:w-auto gap-6">
-                                    <MiniTrendBar data={buyer.purchasingTrends || [40, 45, 42, 50, 55, 52, 60, 65, 62, 70, 75, 72]} />
-                                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover/buyer:text-blue-600 group-hover/buyer:translate-x-1 transition-all" />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      <button onClick={() => handleLiveRecon(s.chemicalName)} className="w-full py-4 lg:py-6 bg-blue-600 text-white text-[9px] lg:text-[10px] font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all z-10">
-                        Target Asset Recon
-                      </button>
-                  </div>
-                )) : (
-                  [1, 2].map(i => (
-                    <div key={i} className="bg-white border border-slate-200 rounded-[2.5rem] p-10 animate-pulse">
-                      <div className="h-8 bg-slate-100 rounded w-1/4 mb-4"></div>
-                      <div className="h-12 bg-slate-100 rounded w-1/2 mb-8"></div>
-                      <div className="grid grid-cols-4 gap-6 mb-8">
-                        <div className="h-20 bg-slate-50 rounded-2xl"></div>
-                        <div className="h-20 bg-slate-50 rounded-2xl"></div>
-                        <div className="h-20 bg-slate-50 rounded-2xl"></div>
-                        <div className="h-20 bg-slate-50 rounded-2xl"></div>
-                      </div>
-                      <div className="h-16 bg-slate-100 rounded-2xl"></div>
-                    </div>
-                  ))
-                )}
-             </div>
-          </div>
-          <div className="col-span-12 lg:col-span-4 space-y-6 lg:space-y-8">
-             <div className="bg-white border border-slate-200 p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] shadow-sm">
-                <h3 className="text-[10px] lg:text-xs font-black text-slate-900 uppercase tracking-widest mb-8 lg:mb-10 flex items-center gap-3"><BrainCircuit className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600" /> Mathematical Engine</h3>
-                <div className="space-y-4 lg:space-y-6">
-                  <div className="p-4 lg:p-6 bg-slate-50 border border-slate-100 rounded-2xl">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase">Model Convergence</span>
-                      <span className="text-[10px] lg:text-xs font-black text-emerald-600">{engineStats.convergence.toFixed(1)}%</span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-emerald-500 h-full transition-all duration-1000" style={{ width: `${engineStats.convergence}%` }}></div>
-                    </div>
-                  </div>
-                  <div className="p-4 lg:p-6 bg-slate-50 border border-slate-100 rounded-2xl">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase">Signal Entropy</span>
-                      <span className="text-[10px] lg:text-xs font-black text-blue-600">{engineStats.entropy.toFixed(2)} bits</span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-blue-500 h-full transition-all duration-1000" style={{ width: `${(engineStats.entropy / 0.5) * 100}%` }}></div>
-                    </div>
-                  </div>
-                  <div className="p-4 lg:p-6 bg-slate-50 border border-slate-100 rounded-2xl">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase">Forecast Skill (Avg)</span>
-                      <span className="text-[10px] lg:text-xs font-black text-indigo-600">{engineStats.forecastSkill.toFixed(1)}%</span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-indigo-500 h-full transition-all duration-1000" style={{ width: `${engineStats.forecastSkill}%` }}></div>
-                    </div>
-                  </div>
-                </div>
-             </div>
-
-             <div className="bg-white border border-slate-200 p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] shadow-sm">
-                <h3 className="text-[10px] lg:text-xs font-black text-slate-900 uppercase tracking-widest mb-8 lg:mb-10 flex items-center gap-3"><Globe2 className="w-4 h-4 lg:w-5 lg:h-5 text-indigo-600" /> Neural Arbitrage</h3>
-                {arbitrage?.length > 0 ? arbitrage.map((a, i) => (
-                  <div key={i} className="p-4 lg:p-6 bg-slate-50 border border-slate-100 rounded-2xl mb-4 group hover:border-blue-200 transition-all">
-                     <div className="flex justify-between items-center mb-1">
-                       <span className="text-sm lg:text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors">{a.asset}</span>
-                       <span className="text-[10px] lg:text-xs font-black text-green-600">+{a.margin}</span>
-                     </div>
-                     <p className="text-[9px] lg:text-[10px] text-slate-400 font-bold uppercase tracking-tight">{a.buyRegion} <ArrowRight className="inline w-3 h-3 mx-1" /> {a.sellRegion}</p>
-                     <div className="mt-4 flex justify-between items-center text-[8px] lg:text-[9px] font-black text-slate-500 uppercase">
-                        <span>Potential: {a.volumePotential}</span>
-                        <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Risk: {a.riskFactor}/100</span>
-                     </div>
-                  </div>
-                )) : (
-                  <div className="py-10 lg:py-20 text-center space-y-4">
-                    <Radar className="w-8 h-8 lg:w-10 lg:h-10 text-slate-200 animate-pulse mx-auto" />
-                    <p className="text-[9px] lg:text-[10px] font-black text-slate-300 uppercase">Probing Corridors...</p>
-                  </div>
-                )}
-             </div>
-             <MarketChart data={forecast} title={`${selectedSegment} Outlook`} />
-
-             <div className="bg-white border border-slate-200 p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] shadow-sm">
-                <h3 className="text-[10px] lg:text-xs font-black text-slate-900 uppercase tracking-widest mb-8 lg:mb-10 flex items-center gap-3"><Zap className="w-4 h-4 lg:w-5 lg:h-5 text-blue-600" /> Neural News Feed</h3>
-                <div className="space-y-6">
-                  {news?.length > 0 ? news.slice(0, 5).map((article, i) => (
-                    <div key={i} className="group cursor-pointer">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-[9px] lg:text-[10px] font-black text-blue-600 uppercase tracking-widest">{article.source}</span>
-                        <span className="text-[8px] lg:text-[9px] font-bold text-slate-400 uppercase">{article.timestamp}</span>
-                      </div>
-                      <h4 className="text-xs lg:text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors leading-tight mb-2">{article.title}</h4>
-                      <div className="flex items-center gap-4">
-                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${
-                          article.sentiment === 'Positive' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                          article.sentiment === 'Negative' ? 'bg-red-50 text-red-600 border-red-100' :
-                          'bg-slate-50 text-slate-400 border border-slate-100'
-                        }`}>
-                          {article.sentiment}
-                        </span>
-                        <span className="text-[8px] lg:text-[9px] font-black text-slate-400 uppercase">Impact: {article.impactScore}</span>
-                      </div>
-                    </div>
-                  )) : (
-                    [1, 2, 3].map(i => (
-                      <div key={i} className="animate-pulse space-y-2">
-                        <div className="h-3 bg-slate-100 rounded w-1/4"></div>
-                        <div className="h-4 bg-slate-100 rounded w-full"></div>
-                        <div className="h-3 bg-slate-100 rounded w-1/2"></div>
-                      </div>
-                    ))
-                  )}
+                <div className="flex items-center gap-4">
+                   <div className="flex flex-col items-end">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sentiment</span>
+                      <span className={`text-xs font-bold ${sentiment === 'Bullish' ? 'text-emerald-600' : 'text-red-600'}`}>{sentiment}</span>
+                   </div>
                 </div>
               </div>
+              <MarketChart data={forecast} title={`${selectedSegment} Outlook`} />
+            </div>
+
+            <div className="stitch-card p-6 lg:p-10 bg-slate-900 text-white border-none">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-semibold tracking-tight flex items-center gap-3">
+                  <Radar className="w-5 h-5 text-blue-500" /> Neural Intelligence Feed
+                </h3>
+                <button 
+                  onClick={() => handleLiveRecon('Market')}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all"
+                >
+                  Refresh Nodes
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                {signals.slice(0, 4).map((signal) => (
+                  <div 
+                    key={signal.id} 
+                    className="p-5 bg-slate-50 border border-slate-100 rounded-2xl hover:border-blue-200 transition-all cursor-pointer group"
+                    onClick={() => toggleSignalExpansion(signal.id)}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${signal.demandTrend === 'Up' ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                        <h4 className="text-sm font-bold text-slate-900">{signal.chemicalName}</h4>
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{signal.predictionHorizon}</span>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed mb-3">{signal.reasoning}</p>
+                    
+                    {expandedSignals.includes(signal.id) && (
+                      <div className="mt-4 pt-4 border-t border-slate-200/50 grid grid-cols-2 gap-4 animate-in slide-in-from-top-2 duration-300">
+                        <div>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase mb-1 tracking-widest">Confidence</p>
+                          <p className="text-xs font-bold text-blue-600">{signal.mathematicalConfidence}%</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase mb-1 tracking-widest">Segment</p>
+                          <p className="text-xs font-bold text-slate-700">{signal.segment}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-       </div>
+
+          {/* Sidebar Area */}
+          <div className="space-y-8">
+            <div className="stitch-card p-6 lg:p-8">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-3">
+                <TrendingUp className="w-4 h-4 text-blue-600" /> Top Movers
+              </h3>
+              <div className="space-y-4">
+                {topProducts.map((product, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-blue-200 transition-all">
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{product.name}</p>
+                      <p className="text-[10px] font-medium text-slate-500 uppercase">{product.sector}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-slate-900">{product.price}</p>
+                      <p className={`text-[10px] font-bold ${product.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'}`}>
+                        {product.trend}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="stitch-card p-6 lg:p-8 bg-blue-600 text-white border-none shadow-lg shadow-blue-600/20">
+              <h3 className="text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-3">
+                <BrainCircuit className="w-5 h-5" /> Neural Engine
+              </h3>
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[10px] font-bold text-blue-100 uppercase">Convergence</span>
+                    <span className="text-xs font-bold">{engineStats.convergence}%</span>
+                  </div>
+                  <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full bg-white w-[94.2%]"></div>
+                  </div>
+                </div>
+                <div className="p-4 bg-white/10 rounded-2xl border border-white/20">
+                  <p className="text-[10px] font-bold text-blue-100 uppercase mb-1">Forecast Skill</p>
+                  <p className="text-xl font-light">{engineStats.forecastSkill}% Accuracy</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
   );
 };

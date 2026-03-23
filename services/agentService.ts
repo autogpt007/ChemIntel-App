@@ -2,6 +2,7 @@
 import { COAEntry, HubIntel, MarketSignal, AgentMessage, AgentStats, AgentTask } from '../types';
 import { costOptimizer, ComplexityLevel } from './costOptimizer';
 import { geminiService } from './geminiService';
+import { integrationService } from './integrationService';
 
 class AgentService {
   private skynetStatus: 'Dormant' | 'Waking' | 'Active' | 'Overloaded' = 'Waking';
@@ -104,8 +105,24 @@ class AgentService {
     this.addTask('arch', 'Market', `Orchestrating council response for: ${userMessage.substring(0, 30)}...`);
 
     try {
+      // GROUNDING: Fetch external data based on user message
+      let groundingContext = "";
+      const lowerMsg = userMessage.toLowerCase();
+      
+      if (lowerMsg.includes('shipping') || lowerMsg.includes('route') || lowerMsg.includes('logistics')) {
+        const logistics = await integrationService.fetchLogisticsData('Shanghai', 'Rotterdam');
+        groundingContext += `\n[NEURAL LOGISTICS GROUNDING]: Route ${logistics.route}, Transit: ${logistics.avgTransitTime}, Congestion: ${logistics.congestionLevel}, Risk: ${logistics.riskLevel}\n`;
+      }
+      
+      if (lowerMsg.includes('compliance') || lowerMsg.includes('reach') || lowerMsg.includes('ghs')) {
+        const compliance = await integrationService.checkCompliance('Target Chemical', 'Europe');
+        groundingContext += `\n[COMPLIANCE GROUNDING]: Status: ${compliance.status}, Hazard: ${compliance.hazard}, Restriction: ${compliance.restriction}\n`;
+      }
+
       const systemInstruction = `You are The Architect, the orchestrator of the ChemIntel Neural Council. 
       Analyze the user request and decide which specialized agents should be consulted.
+      
+      ${groundingContext ? `EXTERNAL GROUNDING DATA AVAILABLE: ${groundingContext}` : ''}
       
       Available Agents:
       - recon: Market Intelligence, price discrepancies, demand signals.

@@ -56,7 +56,7 @@ const NeuralCouncilView: React.FC = () => {
   };
 
   return (
-    <div className="lg:h-[calc(100vh-180px)] flex flex-col gap-6 lg:gap-8 animate-in fade-in duration-700">
+    <div className="h-auto lg:h-[calc(100vh-180px)] flex flex-col gap-6 lg:gap-8 animate-in fade-in duration-700">
       <div className="grid grid-cols-12 gap-6 lg:gap-8 h-full">
         {/* Chat Area */}
         <div className="col-span-12 lg:col-span-8 flex flex-col bg-[#0c1220] border border-slate-800 rounded-[2rem] lg:rounded-[3rem] overflow-hidden shadow-3xl">
